@@ -14,204 +14,6 @@ let keyboardHintDiv;
     monitorExactClassSelectChange(); // Start observing
 })();
 
-// function insertPanel(container) {
-//     container.style.maxWidth = '100%';
-//     container.style.padding = '0';
-//     container.style.margin = '0';
-//     container.style.width = '100%';
-//     container.style.display = 'flex';
-//     container.style.flexDirection = 'row';
-//     container.style.gap = '10px';
-
-//     const cardBody = container.querySelector('.card-body');
-//     cardBody.style.boxSizing = 'border-box';
-
-//     if (document.getElementById('myCustomGreenDiv')) return;
-
-//     const newCard = document.createElement('div');
-//     newCard.className = 'card card-custom h-100 w-screen';
-//     newCard.id = 'myCustomGreenDiv';
-
-//     // const header = document.createElement("div");
-//     // header.style.fontWeight = "bold";
-//     // header.style.textAlign = "center";
-//     // header.style.padding = "12px 0";
-//     // header.style.fontSize = "16px";
-//     // header.style.borderBottom = "1px solid #ddd";
-//     // header.innerHTML = `📘 BRACU Connect Attendance Helper`;
-
-//     // newCard.appendChild(header);  // ✅ Inserted first and only once
-
-
-//     const newCardBody = document.createElement('div');
-//     newCardBody.className = 'card-body';
-//     newCardBody.style.position = 'sticky';
-//     newCardBody.style.height = '75vh';
-//     newCardBody.style.width = '23vw';
-//     newCardBody.style.backgroundColor = '#f9f9f9';
-//     newCardBody.style.color = '#333';
-//     newCardBody.style.boxSizing = 'border-box';
-//     newCardBody.style.padding = '20px';
-//     newCardBody.style.display = 'flex';
-//     newCardBody.style.flexDirection = 'column';
-//     newCardBody.style.justifyContent = 'space-between';
-
-//     // Student card container
-//     const studentCardDiv = document.createElement('div');
-//     studentCardDiv.id = 'studentCardDiv';
-//     studentCardDiv.style.flexGrow = '1';
-//     studentCardDiv.style.overflowY = 'auto';
-//     studentCardDiv.style.display = 'flex';
-//     studentCardDiv.style.alignItems = 'center';
-//     studentCardDiv.style.justifyContent = 'center';
-//     studentCardDiv.style.flexDirection = 'column';
-
-//     // Start Button Wrapper (only if not already created)
-//     if (!document.getElementById("startBtnWrapper")) {
-//         const startBtnWrapper = document.createElement("div");
-//         startBtnWrapper.id = "startBtnWrapper";
-//         startBtnWrapper.style.display = "flex";
-//         startBtnWrapper.style.justifyContent = "center";
-//         startBtnWrapper.style.alignItems = "center";
-//         startBtnWrapper.style.height = "100%";
-
-//         const startBtn = document.createElement("button");
-//         startBtn.className = "btn btn-success";
-//         startBtn.innerHTML = `<i class="bi bi-play-circle me-1"></i> Start Attendance`;
-//         startBtn.onclick = () => {
-//             const table = document.querySelector('.card-body table');
-//             if (!table) {
-//                 alert("Student table not found. Make sure the list is visible.");
-//                 return;
-//             }
-//             startBtn.disabled = true;
-//             startBtn.innerText = "Starting...";
-//             extractStudents();
-//             currentIndex = 0;
-//             renderCard();
-//             window.addEventListener('keydown', handleKeyDown);
-
-//             startBtnWrapper.remove();
-//             document.querySelector(".d-flex.mt-4, .d-flex.flex-wrap.mt-4")?.classList.remove("d-none");
-//         };
-
-//         startBtnWrapper.appendChild(startBtn);
-//         // Header (put immediately after newCardBody is created)
-//         const header = document.createElement("div");
-//         header.style.fontWeight = "bold";
-//         header.style.textAlign = "center";
-//         header.style.marginBottom = "10px";
-//         header.style.fontSize = "16px";
-//         header.innerHTML = `📘 BRACU Connect Attendance Helper`;
-
-//         newCardBody.appendChild(header); // Append it BEFORE startBtnWrapper
-
-//         newCardBody.appendChild(startBtnWrapper);
-
-
-//     }
-
-//     // Action Buttons (initially hidden)
-//     const buttonContainer = document.createElement("div");
-//     buttonContainer.className = "d-flex flex-wrap justify-content-center gap-3 mt-4 d-none";
-
-//     const resetBtn = document.createElement("button");
-//     resetBtn.className = "btn btn-secondary";
-//     resetBtn.innerHTML = `<i class="bi bi-arrow-repeat me-1"></i> Reset`;
-//     resetBtn.onclick = () => {
-//         studentsList.forEach(s => {
-//             const radios = s.row.querySelectorAll('input[type="radio"]');
-//             if (radios.length >= 2) {
-//                 radios[0].checked = false;
-//                 radios[1].checked = false;
-//             }
-//             s.status = undefined;
-//         });
-//         currentIndex = 0;
-//         renderCard();
-//     };
-
-//     const copyBtn = document.createElement("button");
-//     copyBtn.className = "btn d-flex align-items-center justify-content-center";
-//     copyBtn.style.backgroundColor = "#5b9bd5";
-//     copyBtn.style.color = "#fff";
-//     copyBtn.style.border = "none";
-//     copyBtn.style.padding = "10px 16px";
-//     copyBtn.style.fontWeight = "500";
-//     copyBtn.style.transition = "background-color 0.3s ease";
-//     copyBtn.innerHTML = `<i class="bi bi-clipboard-check me-1" style="color: white;"></i> Copy Full Report`;
-
-//     copyBtn.onmouseover = () => {
-//         copyBtn.style.backgroundColor = "#498ecb";
-//     };
-//     copyBtn.onmouseleave = () => {
-//         copyBtn.style.backgroundColor = "#5b9bd5";
-//     };
-
-//     copyBtn.onclick = () => {
-//         let classDate = "Attendance";
-//         try {
-//             const allFields = document.querySelectorAll('formly-field');
-//             for (const field of allFields) {
-//                 if (field.innerText.includes('Class')) {
-//                     const span = field.querySelector('.mat-mdc-select-value-text span');
-//                     if (span && span.innerText.includes('-')) {
-//                         const match = span.innerText.match(/\d{2}-\d{2}-\d{4}/);
-//                         if (match) classDate = match[0];
-//                         break;
-//                     }
-//                 }
-//             }
-//         } catch (err) {
-//             console.warn("Could not find class date:", err);
-//         }
-
-//         let text = `ID\tName\t${classDate}\n`;
-//         studentsList.forEach(s => {
-//             text += `${s.id}\t${s.name}\t${s.status || "Not marked"}\n`;
-//         });
-
-//         navigator.clipboard.writeText(text).then(() => {
-//             const originalHTML = copyBtn.innerHTML;
-//             copyBtn.innerHTML = `<i class="bi bi-check2-circle me-1"></i> Copied!`;
-//             copyBtn.disabled = true;
-//             setTimeout(() => {
-//                 copyBtn.innerHTML = originalHTML;
-//                 copyBtn.disabled = false;
-//             }, 1500);
-//         });
-//     };
-
-//     buttonContainer.appendChild(copyBtn);
-//     buttonContainer.appendChild(resetBtn);
-
-//     keyboardHintDiv = document.createElement("div");
-//     keyboardHintDiv.className = "text-muted text-center mb-2";
-//     keyboardHintDiv.style.fontSize = "13px";
-//     keyboardHintDiv.title = "Keyboard Shortcut";
-//     keyboardHintDiv.style.display = "none"; // hide initially
-//     keyboardHintDiv.innerHTML = `Press <b>←</b> for Absent &nbsp;&nbsp;|&nbsp;&nbsp; <b>→</b> for Present`;
-
-//     newCardBody.appendChild(keyboardHintDiv);
-//     newCardBody.appendChild(studentCardDiv);
-
-//     newCardBody.appendChild(buttonContainer);
-
-//     const footer = document.createElement("div");
-//     footer.className = "text-center mt-3 text-muted";
-//     footer.style.fontSize = "11px";
-//     footer.style.opacity = "0.7";
-//     footer.innerHTML = `👨‍💻 Created by Md. Khaliduzzaman Khan Samrat - KKS`;
-//     newCardBody.appendChild(footer);
-
-//     newCard.appendChild(newCardBody);
-//     container.appendChild(newCard);
-
-//     injectStyles();
-// }
-
-// Replace your insertPanel function with this updated version
-
 function insertPanel(container) {
     container.style.maxWidth = '100%';
     container.style.padding = '0';
@@ -313,33 +115,6 @@ function insertPanel(container) {
         newCardBody.appendChild(startBtnWrapper);
     }
 
-    // Info & warning chips
-    // const chipContainer = document.createElement("div");
-    // chipContainer.className = "d-flex flex-column gap-2 mb-2";
-
-    // const infoChip = document.createElement("div");
-    // infoChip.style.backgroundColor = "#e7f3fe";
-    // infoChip.style.color = "#0c5460";
-    // infoChip.style.border = "1px solid #b8daff";
-    // infoChip.style.borderRadius = "16px";
-    // infoChip.style.padding = "8px 12px";
-    // infoChip.style.fontSize = "13px";
-    // infoChip.innerHTML = `<i class="bi bi-info-circle-fill me-1" style="color: #0c5460;"></i> Don't forget to save attendance on Connect.`;
-
-    // const warningChip = document.createElement("div");
-    // warningChip.style.backgroundColor = "#fff3cd";
-    // warningChip.style.color = "#856404";
-    // warningChip.style.border = "1px solid #ffeeba";
-    // warningChip.style.borderRadius = "16px";
-    // warningChip.style.padding = "8px 12px";
-    // warningChip.style.fontSize = "13px";
-    // warningChip.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-1" style="color: #856404;"></i> Copy button only backs up — it doesn't save attendance.`;
-
-    // chipContainer.appendChild(infoChip);
-    // chipContainer.appendChild(warningChip);
-
-    // Append to newCardBody
-    // newCardBody.appendChild(chipContainer);
 
 
     // Action Buttons (initially hidden)
@@ -524,7 +299,7 @@ function adjustMainContentWidth() {
     }
 }
 
-// Update your injectStyles function to include responsive styles
+// Update   injectStyles function to include responsive styles
 function injectStyles() {
     const style = document.createElement('style');
     style.innerHTML = `
@@ -726,21 +501,6 @@ function markAttendance(status) {
     student.status = status;
 }
 
-// function handleKeyDown(e) {
-//     if (currentIndex >= studentsList.length) return;
-
-//     if (e.key === 'Enter') {
-//         markAttendance('Present');
-//         currentIndex++;
-//         renderCard();
-//     }
-//     if (e.key === ' ' || e.code === 'Space') {
-//         e.preventDefault();
-//         markAttendance('Absent');
-//         currentIndex++;
-//         renderCard();
-//     }
-// }
 
 function handleKeyDown(e) {
     if (currentIndex >= studentsList.length) return;
@@ -805,28 +565,6 @@ function renderAttendanceComplete() {
         console.warn("Could not extract class date:", e);
     }
 
-    // Card container
-    // let html = `
-    // <div style="
-    //     background: #fff;
-    //     border-radius: 12px;
-    //     padding: 20px;
-    //     box-shadow: 0 4px 16px rgba(0,0,0,0.05);
-    //     width: auto;
-    //     max-height: 70vh;
-    //     overflow-y: auto;
-    //     display: inline-block;
-    // ">
-    //     <h2 style="font-size: 17px; margin-bottom: 4px;">
-    //         📋 Attendance Report - <span style="color: #007bff;">${classDate}</span>
-    //     </h2>
-    //     <h3 
-    //         style="font-size: 15px; margin-bottom: 10px; color: #444;" 
-    //         title="Students not marked as present"
-    //     >
-    //         👥 Absent Students
-    //     </h3>
-    // `;
     let html = `
   <div class="d-flex flex-column gap-2 mb-3">
     <div style="
