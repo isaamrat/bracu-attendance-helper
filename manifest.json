@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "BRACU Connect Attendance Entry Helper",
+  "version": "1.0",
+  "description": "Take attendance efficiently by showing student cards and selecting present/absent using keyboard shortcuts.",
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": [
+    "https://connect.bracu.ac.bd/app/exam-controller/attendance/entry"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://connect.bracu.ac.bd/app/exam-controller/attendance/entry*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "48": "icons/icon.png"
+  },
+  "action": {
+    "default_icon": "icons/icon.png",
+    "default_title": "BRACU Attendance Helper"
+  }
+}
