@@ -25,7 +25,7 @@ A lightweight Chrome extension that enhances the BRACU Connect attendance entry 
         bracu-attendance-helper/
         ├── manifest.json
         ├── content.js
-        └── icon.png (48x48 PNG icon)
+        └── icons/icon.png
         ```
 
 2. **Enable Developer Mode in Chrome**
