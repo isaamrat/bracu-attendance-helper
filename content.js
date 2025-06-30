@@ -489,15 +489,16 @@ function renderCard() {
 function markAttendance(status) {
     const student = studentsList[currentIndex];
     const radios = student.row.querySelectorAll('input[type="radio"]');
+
     if (radios.length >= 2) {
-        if (status === 'Present') {
-            radios[0].checked = true;
-            radios[0].click();
-        } else {
-            radios[1].checked = true;
-            radios[1].click();
-        }
+        const targetRadio = status === 'Present' ? radios[0] : radios[1];
+        targetRadio.checked = true;
+
+        // Dispatch a proper change event
+        const event = new Event('change', { bubbles: true });
+        targetRadio.dispatchEvent(event);
     }
+
     student.status = status;
 }
 
