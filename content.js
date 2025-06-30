@@ -174,6 +174,11 @@ function insertPanel(container) {
 
         let text = `ID\tName\t${classDate}\n`;
         studentsList.forEach(s => {
+            const radios = s.row.querySelectorAll('input[type="radio"]');
+            if (radios[0].checked) s.status = 'Present';
+            else if (radios[1].checked) s.status = 'Absent';
+            else s.status = undefined;
+
             text += `${s.id}\t${s.name}\t${s.status || "Not marked"}\n`;
         });
 
@@ -405,6 +410,21 @@ function injectStyles() {
 
 
 
+// function extractStudents() {
+//     const table = document.querySelector('.card-body table');
+//     const rows = table.querySelectorAll('tbody tr');
+//     studentsList = [];
+
+//     rows.forEach(row => {
+//         const columns = row.querySelectorAll('td');
+//         if (columns.length >= 3) {
+//             const id = columns[0].innerText.trim();
+//             const name = columns[1].innerText.trim();
+//             studentsList.push({ id, name, row });
+//         }
+//     });
+// }
+
 function extractStudents() {
     const table = document.querySelector('.card-body table');
     const rows = table.querySelectorAll('tbody tr');
@@ -416,8 +436,29 @@ function extractStudents() {
             const id = columns[0].innerText.trim();
             const name = columns[1].innerText.trim();
             studentsList.push({ id, name, row });
+
+            // Attach event listeners to the radio buttons
+            const radios = row.querySelectorAll('input[type="radio"]');
+            if (radios.length >= 2) {
+                radios[0].addEventListener('change', () => onRadioChange(id, 'Present'));
+                radios[1].addEventListener('change', () => onRadioChange(id, 'Absent'));
+            }
         }
     });
+}
+
+function onRadioChange(studentId, newStatus) {
+    const student = studentsList.find(s => s.id === studentId);
+    if (student) {
+        student.status = newStatus;
+        highlightCurrentRow();
+
+        // If report is shown, re-render it
+        const cardDiv = document.getElementById("studentCardDiv");
+        if (cardDiv && cardDiv.innerHTML.includes("Attendance Report")) {
+            renderAttendanceComplete();
+        }
+    }
 }
 
 
