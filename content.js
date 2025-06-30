@@ -155,6 +155,7 @@ function insertPanel(container) {
     };
 
     copyBtn.onclick = () => {
+
         let classDate = "Attendance";
         try {
             const allFields = document.querySelectorAll('formly-field');
@@ -173,6 +174,12 @@ function insertPanel(container) {
         }
 
         let text = `ID\tName\t${classDate}\n`;
+        // studentsList.forEach(s => {
+        //     text += `${s.id}\t${s.name}\t${s.status || "Not marked"}\n`;
+        // });
+        // ✅ Append manual students only after `text` is declared
+        const checkboxes = document.querySelectorAll("#manualStudentList input[type='checkbox']");
+        const manualStudents = JSON.parse(localStorage.getItem("attendance_manual_students") || "[]");
         studentsList.forEach(s => {
             const radios = s.row.querySelectorAll('input[type="radio"]');
             if (radios[0].checked) s.status = 'Present';
@@ -181,6 +188,15 @@ function insertPanel(container) {
 
             text += `${s.id}\t${s.name}\t${s.status || "Not marked"}\n`;
         });
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                const student = manualStudents[cb.dataset.index];
+                if (student) {
+                    text += `${student.id}\t${student.name}\tPresent\n`;
+                }
+            }
+        });
+
 
         navigator.clipboard.writeText(text).then(() => {
             const originalHTML = copyBtn.innerHTML;
@@ -260,6 +276,56 @@ function hookSaveButtonToCopy() {
         } else {
             console.warn('[Attendance Helper] Copy button not found.');
         }
+    });
+}
+
+function renderManualStudentList() {
+    const list = document.getElementById("manualStudentList");
+    if (!list) return;
+    list.innerHTML = "";
+
+    const students = JSON.parse(localStorage.getItem("attendance_manual_students") || "[]");
+
+    students.forEach((s, index) => {
+        const item = document.createElement("div");
+        item.style.background = "#f0f8ff"; // pastel blue
+        item.style.border = "1px solid #cce5ff";
+        item.style.borderRadius = "6px";
+        item.style.padding = "6px 10px";
+        item.style.fontSize = "13px";
+        item.style.display = "flex";
+        item.style.justifyContent = "space-between";
+        item.style.alignItems = "center";
+        item.style.width = "100%";
+        item.style.maxWidth = "300px";
+
+
+
+
+        const left = document.createElement("label");
+        left.style.display = "flex";
+        left.style.alignItems = "center";
+        left.style.gap = "6px";
+        left.innerHTML = `
+            <input type="checkbox" data-index="${index}" />
+            <span>${s.id} - ${s.name}</span>
+        `;
+
+        const delBtn = document.createElement("button");
+        delBtn.innerHTML = `<i class="bi bi-trash" style="color: #a00; font-size: 14px;"></i>`;
+        delBtn.style.border = "none";
+        delBtn.style.background = "transparent";
+        delBtn.style.cursor = "pointer";
+        delBtn.title = "Remove";
+        delBtn.onclick = () => {
+            const updated = students.filter((_, i) => i !== index);
+            localStorage.setItem("attendance_manual_students", JSON.stringify(updated));
+            renderManualStudentList();
+        };
+
+        item.appendChild(left);
+        item.appendChild(delBtn);
+        list.appendChild(item);
     });
 }
 
@@ -706,6 +772,124 @@ function renderAttendanceComplete() {
 
     cardDiv.innerHTML = html;
     highlightCurrentRow();
+
+
+    //New Feature
+    const manualCard = document.createElement("div");
+    manualCard.style.background = "#eaf4fc";
+    manualCard.style.border = "1px solid #cce5ff";
+    manualCard.style.borderRadius = "12px";
+    manualCard.style.padding = "14px 18px";
+    manualCard.style.marginTop = "16px";
+    manualCard.style.boxShadow = "0 3px 8px rgba(0,0,0,0.05)";
+    manualCard.style.display = "flex";
+    manualCard.style.flexDirection = "column";
+    manualCard.style.alignItems = "center";
+    manualCard.style.maxWidth = "315px";
+    manualCard.style.width = "100%";
+
+    // ─── Header (title + toggle icon) ───────────────────────────────
+    const headerRow = document.createElement("div");
+    headerRow.style.display = "flex";
+    headerRow.style.alignItems = "center";
+    headerRow.style.justifyContent = "center";
+    headerRow.style.width = "100%";
+    headerRow.style.gap = "6px";
+
+    const manualHeader = document.createElement("h3");
+    manualHeader.style.fontSize = "15px";
+    manualHeader.style.color = "#007bff";
+    manualHeader.style.margin = "0";
+    manualHeader.style.padding = "0";
+    manualHeader.innerHTML = `🧑‍🏫 Manually Added Students`;
+
+    const toggleIcon = document.createElement("i");
+    toggleIcon.className = "bi bi-chevron-down";
+    toggleIcon.style.cursor = "pointer";
+    toggleIcon.title = "Toggle View";
+    toggleIcon.style.fontSize = "16px";
+
+    headerRow.appendChild(manualHeader);
+    headerRow.appendChild(toggleIcon);
+    manualCard.appendChild(headerRow);
+
+    // ─── Toggle Content Section ───────────────────────────────
+    const manualSection = document.createElement("div");
+    manualSection.id = "manualSectionContent";
+    manualSection.style.display = "none";
+    manualSection.style.width = "100%";
+    manualSection.style.alignItems = "center";
+    manualSection.style.flexDirection = "column";
+    manualSection.style.marginTop = "10px";
+    manualSection.style.gap = "8px";
+
+    // ─── Form for Add ───────────────────────────────
+    const form = document.createElement("div");
+    form.style.display = "none";
+    form.style.gap = "6px";
+    form.style.justifyContent = "center";
+    form.style.flexWrap = "wrap";
+    form.innerHTML = `
+  <input id="manualStudentID" placeholder="ID" style="width: 80px; padding: 4px;" />
+  <input id="manualStudentName" placeholder="Name" style="width: 140px; padding: 4px;" />
+  <button class="btn btn-sm btn-primary" style="padding: 4px 10px;">Add</button>
+`;
+
+    const toggleFormBtn = document.createElement("button");
+    toggleFormBtn.className = "btn btn-sm btn-outline-primary";
+    toggleFormBtn.innerHTML = `<i class="bi bi-plus-circle me-1"></i> Add Student`;
+    toggleFormBtn.onclick = () => {
+        form.style.display = form.style.display === "none" ? "flex" : "none";
+        toggleFormBtn.innerHTML = form.style.display === "none"
+            ? `<i class="bi bi-plus-circle me-1"></i> Add Student`
+            : `<i class="bi bi-x-circle me-1"></i> Cancel`;
+    };
+
+    form.querySelector("button").onclick = (e) => {
+        e.preventDefault();
+        const idInput = form.querySelector("#manualStudentID");
+        const nameInput = form.querySelector("#manualStudentName");
+        const id = idInput.value.trim();
+        const name = nameInput.value.trim();
+
+        if (id && name) {
+            const current = JSON.parse(localStorage.getItem("attendance_manual_students") || "[]");
+            current.push({ id, name });
+            localStorage.setItem("attendance_manual_students", JSON.stringify(current));
+            idInput.value = "";
+            nameInput.value = "";
+            renderManualStudentList();
+        }
+    };
+
+    // ─── Checklist container ───────────────────────────────
+    const manualListContainer = document.createElement("div");
+    manualListContainer.id = "manualStudentList";
+    manualListContainer.style.display = "flex";
+    manualListContainer.style.flexDirection = "column";
+    manualListContainer.style.gap = "6px";
+    manualListContainer.style.alignItems = "center";
+    manualListContainer.style.width = "100%";
+
+    // ─── Toggle action for full section ───────────────────────────────
+    toggleIcon.onclick = () => {
+        const isVisible = manualSection.style.display === "flex";
+        manualSection.style.display = isVisible ? "none" : "flex";
+        toggleIcon.className = isVisible ? "bi bi-chevron-down" : "bi bi-chevron-up";
+    };
+
+    manualSection.appendChild(toggleFormBtn);
+    manualSection.appendChild(form);
+    manualSection.appendChild(manualListContainer);
+
+    manualCard.appendChild(manualSection);
+    cardDiv.appendChild(manualCard);
+
+    // 🔄 Re-render checklist
+    renderManualStudentList();
+    //New Feature
+
+    
     hookSaveButtonToCopy();
 }
 
