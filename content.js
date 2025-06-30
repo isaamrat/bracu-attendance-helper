@@ -215,19 +215,8 @@ function insertPanel(container) {
     newCardBody.appendChild(footer);
 
     newCard.appendChild(newCardBody);
-    // Don't append to container since we're using fixed positioning
     document.body.appendChild(newCard);
 
-    // Add responsive width calculation and adjust main content
-    // updatePanelWidth();
-    // adjustMainContentWidth();
-    // requestAnimationFrame(() => {
-    //     setTimeout(() => {
-    //         updatePanelWidth();
-    //         adjustMainContentWidth();
-    //     }, 0);
-    // });
-    // Delay layout adjustment
     setTimeout(() => {
         updatePanelWidth();
         adjustMainContentWidth();
@@ -239,6 +228,39 @@ function insertPanel(container) {
     });
 
     injectStyles();
+}
+
+function hookSaveButtonToCopy() {
+    const buttons = document.querySelectorAll('button.btn.btn-primary[type="submit"]');
+
+    let saveBtn = null;
+    for (const btn of buttons) {
+        if (btn.textContent.trim().toLowerCase().includes('save')) {
+            saveBtn = btn;
+            break;
+        }
+    }
+
+    if (!saveBtn) {
+        console.log('[Attendance Helper] Save button not found, retrying...');
+        setTimeout(hookSaveButtonToCopy, 500);
+        return;
+    }
+
+    if (saveBtn.dataset.copyHooked) return;
+
+    saveBtn.dataset.copyHooked = "true";
+
+    saveBtn.addEventListener('click', () => {
+        console.log('[Attendance Helper] Save clicked — triggering attendance copy');
+
+        const copyBtn = document.querySelector('.btn:has(.bi-clipboard-check)');
+        if (copyBtn) {
+            copyBtn.click();
+        } else {
+            console.warn('[Attendance Helper] Copy button not found.');
+        }
+    });
 }
 
 // Add this new function to handle responsive width calculation
@@ -408,22 +430,6 @@ function injectStyles() {
     document.head.appendChild(style);
 }
 
-
-
-// function extractStudents() {
-//     const table = document.querySelector('.card-body table');
-//     const rows = table.querySelectorAll('tbody tr');
-//     studentsList = [];
-
-//     rows.forEach(row => {
-//         const columns = row.querySelectorAll('td');
-//         if (columns.length >= 3) {
-//             const id = columns[0].innerText.trim();
-//             const name = columns[1].innerText.trim();
-//             studentsList.push({ id, name, row });
-//         }
-//     });
-// }
 
 function extractStudents() {
     const table = document.querySelector('.card-body table');
@@ -700,6 +706,7 @@ function renderAttendanceComplete() {
 
     cardDiv.innerHTML = html;
     highlightCurrentRow();
+    hookSaveButtonToCopy();
 }
 
 function fullResetAttendancePanel() {
